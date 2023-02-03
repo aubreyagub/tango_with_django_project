@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+
+{% load staticfiles %} <!-- tells django static files will be used in this template -->
+
+<html>
+    <head>
+        <title>Rango</title>
+    </head>
+    <body>
+        <h1>Rango says...</h1>
+        <div>
+            here is the about page. <br />
+            <strong>{{ boldmessage }}</strong><br />
+        </div>
+        <div>
+            <a href="/rango/">Index</a><br />
+
+            <!-- to insert a static file -->
+            <img src="{% static 'images/rango.jpg' %}"
+                alt=""Picture of Rango" /> 
+            <!-- to insert a media file -->
+            <img src="{{ MEDIA_URL }}cat.jpg" alt="Picture of a Cat."/>.
+        </div>
+    </body>
+</html>
