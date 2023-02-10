@@ -1,6 +1,9 @@
 from django import forms
 from rango.models import Page, Category
+from django.contrib.auth.models import User
+from rango.models import UserProfile
 
+# form to make a new category
 class CategoryForm(forms.ModelForm):
     name = forms.CharField(max_length=Category.max_length_cat, help_text="Please enter the category name.")
 
@@ -12,6 +15,7 @@ class CategoryForm(forms.ModelForm):
         model = Category
         fields = ('name',)
 
+# form to make a new page
 class PageForm(forms.ModelForm):
     title = forms.CharField(max_length=Page.max_length_page,help_text="Please enter the title of the page.")
     url = forms.URLField(max_length=200,help_text="Please enter the URL of the page.")
@@ -31,3 +35,17 @@ class PageForm(forms.ModelForm):
     class Meta:
         model = Page
         exclude = ('category',)
+
+# form to make a new user
+class UserForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput())
+    
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password',)
+
+# form to customise user account
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ('website', 'picture',)
