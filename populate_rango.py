@@ -7,7 +7,7 @@ django.setup()
 from rango.models import Category, Page
 
 def populate():
-    # pages about Python
+       # pages about Python
     python_pages = [
         {'title': 'Official Python Tutorial',
          'url': 'http://docs.python.org/3/tutorial/',
@@ -48,7 +48,7 @@ def populate():
             'Django': {'pages': django_pages, 'likes': 32, 'views': 64},
             'Other Frameworks': {'pages': other_pages, 'likes': 16, 'views': 32}}
 
-    
+
     for cat, cat_data in cats.items():
         c = add_cat(cat, views=cat_data['views'], likes=cat_data['likes'])
         for p in cat_data['pages']:
