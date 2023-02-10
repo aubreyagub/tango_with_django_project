@@ -9,6 +9,7 @@ from rango.forms import UserForm, UserProfileForm
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
+from datetime import datetime
 
 def index(request):
     # order the categories on web app by number of likes (descending) and get top 5
@@ -20,15 +21,22 @@ def index(request):
     context_dict['boldmessage'] = 'Crunchy, creamy, cookie, candy, cupcake!'
     context_dict['categories'] = category_list
     context_dict['pages'] = page_list
+    visitor_cookie_handler(request)
     # display this template on the web app page using the context above
     # note: render() takes in the user’s request, the template filename, and the context dictionary as inputs
-    return render(request, 'rango/index.html', context=context_dict)
+    response = render(request, 'rango/index.html', context=context_dict)
+    # cookie handler set up at the bottom of this file
+    
 
+    return response
 
 def about(request):
     # context to be passed to the template (ie about.html)
-    context_dict = {
-        'boldmessage': 'This tutorial has been put together by Aubrey.'}
+    context_dict = {}
+    visitor_cookie_handler(request)
+    context_dict['visits'] = request.session['visits']
+    context_dict['boldmessage'] = 'This tutorial has been put together by Aubrey.'
+
     return render(request, 'rango/about.html', context=context_dict)
 
 
@@ -142,3 +150,28 @@ def restricted(request):
 def user_logout(request):
     logout(request)
     return redirect(reverse('rango:index'))
+
+def get_server_side_cookie(request, cookie, default_val=None):
+    val = request.session.get(cookie)
+    if not val:
+        val = default_val
+    return val
+
+# to be able to keep track of the number of site visits from unique devices (max count 1 per day per user)
+def visitor_cookie_handler(request):
+
+    visits = int(get_server_side_cookie(request, 'visits', '1'))
+
+    # check information webapp has got on user based on their session ID in their cookies 
+    # info wanted is the last time this device was on the website, to prevent people spamming counter
+    last_visit_cookie = get_server_side_cookie(request,'last_visit', str(datetime.now()))
+    last_visit_time = datetime.strptime(last_visit_cookie[:-7],'%Y-%m-%d %H:%M:%S')
+    
+    if (datetime.now() - last_visit_time).days > 0:
+        visits = visits + 1
+        request.session['last_visit'] = str(datetime.now())
+    else:
+        request.session['last_visit'] = last_visit_cookie
+    
+    # note: this is not a render() to a webpage like the other views but rather to set the value for the visit number
+    request.session['visits'] = visits
